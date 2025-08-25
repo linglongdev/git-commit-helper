@@ -1,0 +1,40 @@
+version: "1"
+
+email: wurongjie@deepin.org
+
+package:
+  id: org.deepin.git-commit-helper
+  name: git-commit-helper
+  version: 0.7.0.0
+  kind: app
+  description: |
+    A helper tool for generating git commit messages.
+  maintainer: zccrs
+
+command: [git-commit-helper] #the commands that your application need to run.
+
+base: org.deepin.base/23.1.0 #set the base environment, this can be changed.
+
+build: |
+  export RUSTUP_DIST_SERVER=https://mirrors.tuna.tsinghua.edu.cn/rustup
+  export CARGO_HOME=/project/linglong/cargo
+  export RUSTUP_HOME=/project/linglong/rustup
+  ls /project/linglong/cargo/env || curl -sSf https://sh.rustup.rs | sh -s -- -y
+  . "/project/linglong/cargo/env"
+  cd linglong/sources/git-commit-helper.git
+  cargo build --release
+  mkdir -p $PREFIX/bin
+  cp target/release/git-commit-helper $PREFIX/bin/
+
+sources:
+  - kind: git
+    url: https://github.com/zccrs/git-commit-helper.git
+    commit: master
+
+buildext:
+  apt:
+    build_depends:
+      - libssl-dev
+      - pkg-config
+    depends:
+      - git
